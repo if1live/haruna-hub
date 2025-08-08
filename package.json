@@ -1,0 +1,16 @@
+{
+  "name": "haruna-hub",
+  "type": "module",
+  "scripts": {
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "deploy": "wrangler deploy --minify",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "hono": "^4.9.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0"
+  },
+  "packageManager": "pnpm@10.14.0"
+}
