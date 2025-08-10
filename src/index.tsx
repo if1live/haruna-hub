@@ -6,6 +6,7 @@ import { prettyJSON } from "hono/pretty-json";
 import z from "zod";
 import { AwsService } from "./services";
 import type { MyBindings } from "./types";
+import { FC } from "hono/jsx";
 
 const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
@@ -70,4 +71,32 @@ app.get("/supabase", async (c) => {
   });
 });
 
-export default app;
+const Layout: FC = (props) => {
+  return (
+    <html>
+      <body>{props.children}</body>
+    </html>
+  )
+}
+
+const Top: FC<{ messages: string[] }> = (props: {
+  messages: string[]
+}) => {
+  return (
+    <Layout>
+      <h1>Hello Hono!</h1>
+      <ul>
+        {props.messages.map((message) => {
+          return <li>{message}!!</li>
+        })}
+      </ul>
+    </Layout>
+  )
+}
+
+app.get('/jsx', (c) => {
+  const messages = ['Good Morning', 'Good Evening', 'Good Night']
+  return c.html(<Top messages={messages} />)
+})
+
+export default app
