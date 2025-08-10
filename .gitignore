@@ -35,3 +35,6 @@ lerna-debug.log*
 # terraform
 .terraform/
 terraform.tfstate
+
+# custom
+wip.md
