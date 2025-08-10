@@ -1,10 +1,13 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
+import { prettyJSON } from "hono/pretty-json";
+import z from "zod";
+import { AwsService } from "./services";
 import type { MyBindings } from "./types";
-import { createLambdaClient } from "./instances";
-import { ListFunctionsCommand } from "@aws-sdk/client-lambda";
 
 const app = new Hono<{ Bindings: MyBindings }>();
+app.use("*", prettyJSON());
 
 app.use("/auth/*", async (c, next) => {
   const auth = basicAuth({
@@ -18,17 +21,40 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.get("/query", async (c) => {
-  const client = createLambdaClient(c.env);
-  // TODO: 페이징 구현? 당장은 함수가 그정도로 많지 않을거다
-  const output = await client.send(
-    new ListFunctionsCommand({
-      MaxItems: 100,
+app.get(
+  "/aws/functions/immediate",
+  zValidator(
+    "query",
+    z.object({
+      region: z.string(),
     }),
-  );
-  const list = output.Functions ?? [];
-  console.log(list);
-  return c.json(list);
-});
+  ),
+  async (c) => {
+    const validated = c.req.valid("query");
+    const client = AwsService.createLambdaClient(validated.region, c.env);
+    const list = await AwsService.loadListFunctions(client);
+    return c.json(list);
+  },
+);
+
+app.get(
+  "/aws/urls/immediate",
+  zValidator(
+    "query",
+    z.object({
+      region: z.string(),
+      functionName: z.string(),
+    }),
+  ),
+  async (c) => {
+    const validated = c.req.valid("query");
+    const client = AwsService.createLambdaClient(validated.region, c.env);
+    const list = await AwsService.loadFunctionUrlConfig(
+      client,
+      validated.functionName,
+    );
+    return c.json(list);
+  },
+);
 
 export default app;
