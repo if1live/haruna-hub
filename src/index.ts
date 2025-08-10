@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { prettyJSON } from "hono/pretty-json";
@@ -56,5 +57,17 @@ app.get(
     return c.json(list);
   },
 );
+
+app.get("/supabase", async (c) => {
+  const env = c.env;
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
+  const { data, error } = await supabase.from("countries").select("*");
+  if (error) throw error;
+  return new Response(JSON.stringify(data), {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+});
 
 export default app;

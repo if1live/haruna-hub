@@ -7,4 +7,8 @@ export type MyBindings = {
   // admin
   ADMIN_ID: string;
   ADMIN_PW: string;
+
+  // supabase
+  SUPABASE_URL: string;
+  SUPABASE_KEY: string;
 };
