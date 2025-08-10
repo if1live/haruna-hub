@@ -6,11 +6,12 @@
     "check:watch": "tsc --watch --noEmit",
     "deploy": "wrangler deploy --minify",
     "dev": "wrangler dev",
-    "fix": "biome check --write .",
+    "fix": "biome check --write --unsafe .",
     "lint": "biome check ."
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.864.0",
+    "@aws-sdk/util-arn-parser": "^3.804.0",
     "@hono/zod-validator": "^0.7.2",
     "@supabase/supabase-js": "^2.54.0",
     "hono": "^4.9.0",

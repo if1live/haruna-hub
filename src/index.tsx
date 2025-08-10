@@ -4,23 +4,20 @@ import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { prettyJSON } from "hono/pretty-json";
 import z from "zod";
+import { fixture } from "./fixture";
+import { Top } from "./layouts";
 import { AwsService } from "./services";
 import type { MyBindings } from "./types";
-import { FC } from "hono/jsx";
 
 const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
 
-app.use("/auth/*", async (c, next) => {
+app.use("/admin/*", async (c, next) => {
   const auth = basicAuth({
     username: c.env.ADMIN_ID,
     password: c.env.ADMIN_PW,
   });
   return auth(c, next);
-});
-
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
 });
 
 app.get(
@@ -71,32 +68,19 @@ app.get("/supabase", async (c) => {
   });
 });
 
-const Layout: FC = (props) => {
-  return (
-    <html>
-      <body>{props.children}</body>
-    </html>
-  )
-}
+app.get("/", (c) => {
+  // TODO: 대충 가공. 하드코딩 아닌거로 갈아타기
+  const list = fixture.urls_apne2.map((item) => {
+    return {
+      arn: item.FunctionArn ?? "",
+      url: item.FunctionUrl ?? "",
+    };
+  });
+  return c.html(<Top functions={list} />);
+});
 
-const Top: FC<{ messages: string[] }> = (props: {
-  messages: string[]
-}) => {
-  return (
-    <Layout>
-      <h1>Hello Hono!</h1>
-      <ul>
-        {props.messages.map((message) => {
-          return <li>{message}!!</li>
-        })}
-      </ul>
-    </Layout>
-  )
-}
+app.get("/admin/", async (c) => {
+  return c.html("TODO: admin");
+});
 
-app.get('/jsx', (c) => {
-  const messages = ['Good Morning', 'Good Evening', 'Good Night']
-  return c.html(<Top messages={messages} />)
-})
-
-export default app
+export default app;
