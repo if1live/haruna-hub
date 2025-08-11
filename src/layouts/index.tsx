@@ -87,7 +87,6 @@ const SiteList: FC<{ sites: Site[] }> = (props) => {
       <thead>
         <tr>
           <th>name</th>
-          <th>location</th>
           <th>etc</th>
         </tr>
       </thead>
@@ -107,7 +106,6 @@ const SiteElement: FC<{
 
   const parsed = parse(arn);
   const name = parsed.resource.split(":")[1];
-  const location = `${parsed.partition}:${parsed.region}:${parsed.service}`;
 
   const data = {
     arn,
@@ -120,7 +118,6 @@ const SiteElement: FC<{
           {name}
         </a>
       </td>
-      <td>{location}</td>
       <td>
         <details>
           <summary>data</summary>

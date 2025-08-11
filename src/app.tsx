@@ -1,22 +1,34 @@
+import * as R from "remeda";
 import { zValidator } from "@hono/zod-validator";
 import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
-import { basicAuth } from "hono/basic-auth";
 import { prettyJSON } from "hono/pretty-json";
 import z from "zod";
 import { LookupAdmin } from "./controllers";
+import { Top } from "./layouts";
 import {
   AwsService,
+  DatabaseService,
   FunctionDefinitionService,
   FunctionUrlService,
+  LookupService,
 } from "./services";
 import type { MyBindings } from "./types";
+
+export const app = new Hono<{ Bindings: MyBindings }>();
+
+const robotsTxt = `
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+`.trimStart();
 
 const _prefix_api = "/api" as const;
 const _prefix_site = "/s" as const;
 const prefix_admin = "/admin" as const;
 
-const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
 
 /*
@@ -28,6 +40,10 @@ app.use("/admin/*", async (c, next) => {
   return auth(c, next);
 });
 */
+
+app.get("/robots.txt", async (c) => {
+  return c.text(robotsTxt);
+});
 
 app.get(
   "/aws/functions/immediate",
@@ -77,23 +93,30 @@ app.get("/supabase", async (c) => {
   });
 });
 
-/*
-app.get("/", (c) => {
-  // TODO: 대충 가공. 하드코딩 아닌거로 갈아타기
-  const list = fixture.urls_apne2.map((item) => {
-    return {
-      arn: item.FunctionArn ?? "",
-      url: item.FunctionUrl ?? "",
-    };
-  });
+app.get("/", async (c) => {
+  const db = DatabaseService.connect(c.env);
+  const founds = await LookupService.load(db);
+  const list = founds
+    .map((x) => {
+      const url = x.url?.functionUrl;
+      if (!url) {
+        return null;
+      }
+      return {
+        arn: x.definition.functionArn,
+        url,
+      };
+    })
+    .filter(R.isNonNullish);
+
+  await db.destroy();
   return c.html(<Top functions={list} />);
 });
-*/
 
-app.get("/admin/", async (c) => {
+// 운영 최상위
+app.get(`${prefix_admin}`, async (c) => c.redirect(`${prefix_admin}/`));
+app.get(`${prefix_admin}/`, async (c) => {
   return c.html("TODO: admin");
 });
 
 app.route(`${prefix_admin}${LookupAdmin.resource}`, LookupAdmin.app);
-
-export default app;
