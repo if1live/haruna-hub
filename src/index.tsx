@@ -3,27 +3,23 @@ import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { prettyJSON } from "hono/pretty-json";
-import {
-  CamelCasePlugin,
-  Kysely,
-  ParseJSONResultsPlugin,
-  PostgresDialect,
-  WithSchemaPlugin,
-} from "kysely";
-import { TablePrefixPlugin } from "kysely-plugin-prefix";
-import { Pool } from "pg";
 import z from "zod";
+import { LookupAdmin } from "./controllers";
 import {
   AwsService,
   FunctionDefinitionService,
   FunctionUrlService,
 } from "./services";
-import type { DB } from "./tables";
 import type { MyBindings } from "./types";
+
+const _prefix_api = "/api" as const;
+const _prefix_site = "/s" as const;
+const prefix_admin = "/admin" as const;
 
 const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
 
+/*
 app.use("/admin/*", async (c, next) => {
   const auth = basicAuth({
     username: c.env.ADMIN_ID,
@@ -31,6 +27,7 @@ app.use("/admin/*", async (c, next) => {
   });
   return auth(c, next);
 });
+*/
 
 app.get(
   "/aws/functions/immediate",
@@ -97,36 +94,6 @@ app.get("/admin/", async (c) => {
   return c.html("TODO: admin");
 });
 
-app.get("/showcases/kysely", async (c) => {
-  // TODO: 더 멀쩡한 방법을 알고싶은데
-  const url = c.env.DATABASE_URL;
-
-  const plugins = [
-    new ParseJSONResultsPlugin(),
-    new CamelCasePlugin(),
-    new TablePrefixPlugin({ prefix: "karin" }),
-    new WithSchemaPlugin("infra"),
-  ];
-
-  const dialect = new PostgresDialect({
-    pool: new Pool({
-      connectionString: url,
-      max: 1,
-    }),
-  });
-  const db = new Kysely<DB>({
-    dialect,
-    plugins,
-  });
-
-  const founds = await db
-    .selectFrom("functionDefinition")
-    .selectAll()
-    .limit(3)
-    .execute();
-  await db.destroy();
-
-  return Response.json(founds);
-});
+app.route(`${prefix_admin}${LookupAdmin.resource}`, LookupAdmin.app);
 
 export default app;

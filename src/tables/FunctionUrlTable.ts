@@ -1,4 +1,4 @@
-import type { Generated } from "kysely";
+import type { Generated, Selectable } from "kysely";
 
 export const name = "functionUrl";
 
@@ -8,3 +8,5 @@ export type Table = {
   functionUrl: string;
   payload: unknown;
 };
+
+export type Row = Selectable<Table>;
