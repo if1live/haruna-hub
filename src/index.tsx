@@ -3,12 +3,19 @@ import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { prettyJSON } from "hono/pretty-json";
-import z from "zod";
-import { fixture } from "./fixture";
-import { Top } from "./layouts";
-import { AwsService } from "./services";
-import type { MyBindings } from "./types";
+import {
+  CamelCasePlugin,
+  Kysely,
+  ParseJSONResultsPlugin,
+  PostgresDialect,
+  WithSchemaPlugin,
+} from "kysely";
+import { TablePrefixPlugin } from "kysely-plugin-prefix";
 import { Pool } from "pg";
+import z from "zod";
+import { AwsService } from "./services";
+import type { DB } from "./tables";
+import type { MyBindings } from "./types";
 
 const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
@@ -86,20 +93,36 @@ app.get("/admin/", async (c) => {
   return c.html("TODO: admin");
 });
 
-app.get("/showcases/pg", async (c) => {
+app.get("/showcases/kysely", async (c) => {
   // TODO: 더 멀쩡한 방법을 알고싶은데
   const url = c.env.DATABASE_URL;
-  const db = new Pool({
-    connectionString: url,
-    // Cloudflare Workers에선 커넥션 너무 많이 열지 말 것
-    // (과도하면 드문 데드락/타임아웃 이슈 가능)
-    max: 1,
-    idleTimeoutMillis: 30_000,
-  });
-  const { rows } = await db.query<{ now: string }>("select now()");
-  await db.end();
 
-  return Response.json({ time: rows[0].now });
+  const plugins = [
+    new ParseJSONResultsPlugin(),
+    new CamelCasePlugin(),
+    new TablePrefixPlugin({ prefix: "karin" }),
+    new WithSchemaPlugin("infra"),
+  ];
+
+  const dialect = new PostgresDialect({
+    pool: new Pool({
+      connectionString: url,
+      max: 1,
+    }),
+  });
+  const db = new Kysely<DB>({
+    dialect,
+    plugins,
+  });
+
+  const founds = await db
+    .selectFrom("functionDefinition")
+    .selectAll()
+    .limit(3)
+    .execute();
+  await db.destroy();
+
+  return Response.json(founds);
 });
 
 export default app;
