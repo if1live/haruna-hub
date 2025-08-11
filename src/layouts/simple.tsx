@@ -7,7 +7,7 @@ type Site = {
   url: string;
 };
 
-const MyNavBar: FC = () => {
+export const MyNavBar: FC = () => {
   return (
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">

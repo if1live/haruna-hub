@@ -2,6 +2,7 @@ import { parse } from "@aws-sdk/util-arn-parser";
 import type { FC } from "hono/jsx";
 import type { FunctionDefinitionModel, FunctionUrlModel } from "../models";
 import { Layout } from "./layout";
+import { MyNavBar } from "./simple";
 
 export const AdminIndex: FC<{
   list: Array<{
@@ -12,6 +13,7 @@ export const AdminIndex: FC<{
   const { list } = props;
   return (
     <Layout>
+      <MyNavBar />
       <div class="container">
         <h1>lookup</h1>
 
