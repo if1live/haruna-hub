@@ -20,9 +20,14 @@ export const retrieve = async (
 
 export const synchronize = async (
   db: Kysely<DB>,
+  region: string,
   inputs: FunctionConfiguration[],
 ) => {
-  const founds = await db.selectFrom(table).selectAll().execute();
+  const founds = await db
+    .selectFrom(table)
+    .selectAll()
+    .where("region", "=", region)
+    .execute();
   type Tuple = (typeof founds)[number];
 
   const map_prev = new Map<string, Tuple>();
@@ -97,6 +102,7 @@ export const synchronize = async (
   if (candidates_insert.length > 0) {
     const values = candidates_insert.map((x) => {
       return {
+        region,
         functionName: x.next.FunctionName ?? "",
         functionArn: x.next.FunctionArn ?? "",
         payload: JSON.stringify(x.next),

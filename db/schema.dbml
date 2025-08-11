@@ -1,7 +1,8 @@
 // Table for FunctionDefinition
 Table infra.haruna_function_definition {
   id integer [pk, increment]
-  function_name varchar(191) [unique]
+  region varchar(191)
+  function_name varchar(191)
   function_arn varchar(191) [unique]
   payload json
 }

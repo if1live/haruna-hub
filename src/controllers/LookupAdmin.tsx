@@ -89,7 +89,11 @@ app.post("/synchronize/list", regionValidator, async (c) => {
   const execute = async (db: Kysely<DB>) => {
     const client = AwsService.createLambdaClient(region, c.env);
     const founds = await FunctionDefinitionService.retrieve(client);
-    const _results = await FunctionDefinitionService.synchronize(db, founds);
+    const _results = await FunctionDefinitionService.synchronize(
+      db,
+      region,
+      founds,
+    );
     return c.redirect(indexLocation);
   };
   return DatabaseService.withDatabase(execute)(c.env);

@@ -4,6 +4,7 @@ export const name = "functionDefinition";
 
 export type Table = {
   id: Generated<number>;
+  region: string;
   functionName: string;
   functionArn: string;
   payload: unknown;
