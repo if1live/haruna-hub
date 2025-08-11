@@ -8,6 +8,7 @@ import { fixture } from "./fixture";
 import { Top } from "./layouts";
 import { AwsService } from "./services";
 import type { MyBindings } from "./types";
+import { Pool } from "pg";
 
 const app = new Hono<{ Bindings: MyBindings }>();
 app.use("*", prettyJSON());
@@ -68,6 +69,7 @@ app.get("/supabase", async (c) => {
   });
 });
 
+/*
 app.get("/", (c) => {
   // TODO: 대충 가공. 하드코딩 아닌거로 갈아타기
   const list = fixture.urls_apne2.map((item) => {
@@ -78,9 +80,26 @@ app.get("/", (c) => {
   });
   return c.html(<Top functions={list} />);
 });
+*/
 
 app.get("/admin/", async (c) => {
   return c.html("TODO: admin");
+});
+
+app.get("/showcases/pg", async (c) => {
+  // TODO: 더 멀쩡한 방법을 알고싶은데
+  const url = c.env.DATABASE_URL;
+  const db = new Pool({
+    connectionString: url,
+    // Cloudflare Workers에선 커넥션 너무 많이 열지 말 것
+    // (과도하면 드문 데드락/타임아웃 이슈 가능)
+    max: 1,
+    idleTimeoutMillis: 30_000,
+  });
+  const { rows } = await db.query<{ now: string }>("select now()");
+  await db.end();
+
+  return Response.json({ time: rows[0].now });
 });
 
 export default app;

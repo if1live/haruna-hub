@@ -11,4 +11,7 @@ export type MyBindings = {
   // supabase
   SUPABASE_URL: string;
   SUPABASE_KEY: string;
+
+  // db
+  DATABASE_URL: string;
 };
