@@ -1,6 +1,8 @@
+import { parse } from "@aws-sdk/util-arn-parser";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
+import { AdminIndex } from "../layouts/admin";
 import { FunctionDefinitionModel, FunctionUrlModel } from "../models";
 import {
   AwsService,
@@ -19,7 +21,6 @@ const indexLocation = `/admin${resource}`;
 const functionNameValidator = zValidator(
   "query",
   z.object({
-    region: z.string(),
     functionName: z.string(),
   }),
 );
@@ -27,7 +28,6 @@ const functionNameValidator = zValidator(
 const functionArnValidator = zValidator(
   "query",
   z.object({
-    region: z.string(),
     functionArn: z.string(),
   }),
 );
@@ -39,7 +39,7 @@ const regionValidator = zValidator(
   }),
 );
 
-app.get("/list", async (c) => {
+app.get("/", async (c) => {
   const db = DatabaseService.connect(c.env);
   const list_naive = await LookupService.load(db);
   const list = list_naive.map((entry) => {
@@ -56,7 +56,7 @@ app.get("/list", async (c) => {
   });
 
   await db.destroy();
-  return c.json(list);
+  return c.html(<AdminIndex list={list} />);
 });
 
 // TODO: 전체 갱신은 무식하지만 확실한 방법
@@ -90,13 +90,15 @@ app.post("/synchronize/list", regionValidator, async (c) => {
   const _results = await FunctionDefinitionService.synchronize(db, founds);
   await db.destroy();
 
-  // return c.redirect(indexLocation);
-  return c.json(founds);
+  return c.redirect(indexLocation);
 });
 
-app.post("/synchronize/url", functionNameValidator, async (c) => {
+app.post("/synchronize/url", functionArnValidator, async (c) => {
   const validated = c.req.valid("query");
-  const { region, functionName } = validated;
+  const { functionArn } = validated;
+  const parsed = parse(functionArn);
+  const region = parsed.region;
+  const functionName = parsed.resource.split(":")[1];
 
   const client = AwsService.createLambdaClient(region, c.env);
   const db = DatabaseService.connect(c.env);
@@ -109,8 +111,7 @@ app.post("/synchronize/url", functionNameValidator, async (c) => {
 
   await db.destroy();
 
-  // return c.redirect(indexLocation);
-  return c.json(founds);
+  return c.redirect(indexLocation);
 });
 
 // 디버깅 목적으로 상세 정보 뜯을 방법 열어두기

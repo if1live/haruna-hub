@@ -1,11 +1,11 @@
-import * as R from "remeda";
 import { zValidator } from "@hono/zod-validator";
 import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 import { prettyJSON } from "hono/pretty-json";
+import * as R from "remeda";
 import z from "zod";
 import { LookupAdmin } from "./controllers";
-import { Top } from "./layouts";
+import { Top } from "./layouts/simple";
 import {
   AwsService,
   DatabaseService,
@@ -114,9 +114,9 @@ app.get("/", async (c) => {
 });
 
 // 운영 최상위
-app.get(`${prefix_admin}`, async (c) => c.redirect(`${prefix_admin}/`));
-app.get(`${prefix_admin}/`, async (c) => {
-  return c.html("TODO: admin");
-});
+const adminIndex = `${prefix_admin}${LookupAdmin.resource}` as const;
+
+app.get(`${prefix_admin}`, async (c) => c.redirect(adminIndex));
+app.get(`${prefix_admin}/`, async (c) => c.redirect(adminIndex));
 
 app.route(`${prefix_admin}${LookupAdmin.resource}`, LookupAdmin.app);
