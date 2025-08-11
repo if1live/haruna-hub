@@ -33,3 +33,14 @@ export const connect = (env: MyBindings): Kysely<DB> => {
   });
   return db;
 };
+
+export const withDatabase = <T>(fn: (db: Kysely<DB>) => Promise<T>) => {
+  return async (env: MyBindings) => {
+    const db = connect(env);
+    try {
+      return await fn(db);
+    } finally {
+      await db.destroy();
+    }
+  };
+};

@@ -2,17 +2,19 @@ import { zValidator } from "@hono/zod-validator";
 import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 import { prettyJSON } from "hono/pretty-json";
+import type { Kysely } from "kysely";
 import * as R from "remeda";
 import z from "zod";
 import { LookupAdmin } from "./controllers";
 import { Top } from "./layouts/simple";
 import {
   AwsService,
-  DatabaseService,
   FunctionDefinitionService,
   FunctionUrlService,
   LookupService,
 } from "./services";
+import { withDatabase } from "./services/DatabaseService";
+import type { DB } from "./tables";
 import type { MyBindings } from "./types";
 
 export const app = new Hono<{ Bindings: MyBindings }>();
@@ -94,23 +96,24 @@ app.get("/supabase", async (c) => {
 });
 
 app.get("/", async (c) => {
-  const db = DatabaseService.connect(c.env);
-  const founds = await LookupService.load(db);
-  const list = founds
-    .map((x) => {
-      const url = x.url?.functionUrl;
-      if (!url) {
-        return null;
-      }
-      return {
-        arn: x.definition.functionArn,
-        url,
-      };
-    })
-    .filter(R.isNonNullish);
+  const execute = async (db: Kysely<DB>) => {
+    const founds = await LookupService.load(db);
+    const list = founds
+      .map((x) => {
+        const url = x.url?.functionUrl;
+        if (!url) {
+          return null;
+        }
+        return {
+          arn: x.definition.functionArn,
+          url,
+        };
+      })
+      .filter(R.isNonNullish);
+    return c.html(<Top functions={list} />);
+  };
 
-  await db.destroy();
-  return c.html(<Top functions={list} />);
+  return withDatabase(execute)(c.env);
 });
 
 // 운영 최상위
