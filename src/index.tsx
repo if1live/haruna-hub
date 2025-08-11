@@ -13,7 +13,11 @@ import {
 import { TablePrefixPlugin } from "kysely-plugin-prefix";
 import { Pool } from "pg";
 import z from "zod";
-import { AwsService } from "./services";
+import {
+  AwsService,
+  FunctionDefinitionService,
+  FunctionUrlService,
+} from "./services";
 import type { DB } from "./tables";
 import type { MyBindings } from "./types";
 
@@ -39,7 +43,7 @@ app.get(
   async (c) => {
     const validated = c.req.valid("query");
     const client = AwsService.createLambdaClient(validated.region, c.env);
-    const list = await AwsService.loadListFunctions(client);
+    const list = await FunctionDefinitionService.retrieve(client);
     return c.json(list);
   },
 );
@@ -56,7 +60,7 @@ app.get(
   async (c) => {
     const validated = c.req.valid("query");
     const client = AwsService.createLambdaClient(validated.region, c.env);
-    const list = await AwsService.loadFunctionUrlConfig(
+    const list = await FunctionUrlService.retrieve(
       client,
       validated.functionName,
     );
