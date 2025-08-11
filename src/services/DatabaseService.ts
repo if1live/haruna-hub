@@ -11,8 +11,7 @@ import type { DB } from "../tables";
 import type { MyBindings } from "../types";
 
 export const connect = (env: MyBindings): Kysely<DB> => {
-  // TODO: 더 멀쩡한 방법을 알고싶은데
-  const url = env.DATABASE_URL;
+  const url = env.HYPERDRIVE.connectionString;
 
   const plugins = [
     new ParseJSONResultsPlugin(),

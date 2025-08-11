@@ -14,4 +14,7 @@ export type MyBindings = {
 
   // db
   DATABASE_URL: string;
+  HYPERDRIVE: {
+    connectionString: string;
+  };
 };

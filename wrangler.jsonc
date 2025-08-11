@@ -9,6 +9,12 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "2848eae8db184f72acbefb596a25d7fa"
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
