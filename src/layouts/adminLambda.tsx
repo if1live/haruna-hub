@@ -28,13 +28,11 @@ const TruncateListButton: FC = () => {
 };
 
 const SynchronizeUrlButton: FC<{ arn: string }> = (props) => {
-  const url = `/admin/lambda/synchronize/url?functionArn=${props.arn}`;
+  const url = `/admin/lambda/${props.arn}/synchronize/url`;
   return (
-    <form method="post" action={url}>
-      <button class="btn btn-outline-secondary" type="submit">
-        url
-      </button>
-    </form>
+    <button class="btn btn-outline-secondary" type="submit" hx-post={url}>
+      url
+    </button>
   );
 };
 

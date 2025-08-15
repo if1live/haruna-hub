@@ -116,9 +116,8 @@ app.post("/synchronize/list", regionValidator, async (c) => {
   return DatabaseService.withDatabase(execute)(c.env);
 });
 
-app.post("/synchronize/url", functionArnValidator, async (c) => {
-  const validated = c.req.valid("query");
-  const { functionArn } = validated;
+app.post("/:arn/synchronize/url", async (c) => {
+  const functionArn = c.req.param("arn");
   const parsed = parse(functionArn);
   const region = parsed.region;
   const functionName = parsed.resource.split(":")[1];
@@ -127,10 +126,12 @@ app.post("/synchronize/url", functionArnValidator, async (c) => {
     const client = AwsService.createLambdaClient(region, c.env);
     const founds = await FunctionUrlService.retrieve(client, functionName);
     const first = founds[0];
-    const _result = first
-      ? await FunctionUrlService.synchronize(db, first)
-      : null;
-    return c.redirect(indexLocation);
+    if (!first) {
+      return c.html(`<span>synchronize.url: not found</span>`);
+    }
+
+    await FunctionUrlService.synchronize(db, first);
+    return c.html(`<span>synchronize.url: ok</span>`);
   };
   return DatabaseService.withDatabase(execute)(c.env);
 });
