@@ -1,5 +1,5 @@
 import { LambdaClient } from "@aws-sdk/client-lambda";
-import type { MyBindings } from "../types";
+import type { MyBindings } from "./types";
 
 type LambdaClientFn = (region: string, env: MyBindings) => LambdaClient;
 

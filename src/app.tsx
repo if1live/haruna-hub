@@ -6,10 +6,10 @@ import type { Kysely } from "kysely";
 import * as R from "remeda";
 import z from "zod";
 import { LambdaAdmin } from "./controllers";
+import { createLambdaClient } from "./instances";
 import { AdminIndex } from "./layouts/adminIndex";
 import { Top } from "./layouts/simple";
 import {
-  AwsService,
   FunctionDefinitionService,
   FunctionUrlService,
   LookupService,
@@ -55,7 +55,7 @@ app.get(
   ),
   async (c) => {
     const validated = c.req.valid("query");
-    const client = AwsService.createLambdaClient(validated.region, c.env);
+    const client = createLambdaClient(validated.region, c.env);
     const list = await FunctionDefinitionService.retrieve(client);
     return c.json(list);
   },
@@ -72,7 +72,7 @@ app.get(
   ),
   async (c) => {
     const validated = c.req.valid("query");
-    const client = AwsService.createLambdaClient(validated.region, c.env);
+    const client = createLambdaClient(validated.region, c.env);
     const list = await FunctionUrlService.retrieve(
       client,
       validated.functionName,
