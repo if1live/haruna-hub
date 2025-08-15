@@ -5,11 +5,12 @@ import { prettyJSON } from "hono/pretty-json";
 import type { Kysely } from "kysely";
 import * as R from "remeda";
 import z from "zod";
-import { LambdaAdmin } from "./controllers";
+import { AuthController, LambdaAdmin } from "./controllers";
 import { createLambdaClient } from "./instances";
 import { AdminIndex } from "./layouts/adminIndex";
 import { Top } from "./layouts/simple";
 import {
+  AuthService,
   FunctionDefinitionService,
   FunctionUrlService,
   LookupService,
@@ -31,15 +32,18 @@ const prefix_admin = "/admin" as const;
 
 app.use("*", prettyJSON());
 
-/*
 app.use("/admin/*", async (c, next) => {
-  const auth = basicAuth({
-    username: c.env.ADMIN_ID,
-    password: c.env.ADMIN_PW,
-  });
-  return auth(c, next);
+  const user = AuthService.getUserFromContext(c);
+  if (!user) {
+    return c.text("Unauthorized", 401);
+  }
+
+  if (user.email !== "libsora25@gmail.com") {
+    return c.text("Forbidden", 403);
+  }
+
+  return next();
 });
-*/
 
 app.get("/robots.txt", async (c) => {
   return c.text(robotsTxt);
@@ -94,6 +98,8 @@ app.get("/supabase", async (c) => {
 });
 
 app.get("/", async (c) => {
+  const user = AuthService.getUserFromContext(c);
+
   const execute = async (db: Kysely<DB>) => {
     const founds = await LookupService.load(db);
     const list = founds
@@ -108,15 +114,18 @@ app.get("/", async (c) => {
         };
       })
       .filter(R.isNonNullish);
-    return c.html(<Top functions={list} />);
+
+    const list0 = user ? list : [];
+    return c.html(<Top functions={list0} />);
   };
 
   return withDatabase(execute)(c.env);
 });
 
+app.route(AuthController.resource, AuthController.app);
+
 // 운영 최상위
 const adminIndex = `${prefix_admin}/` as const;
-
 app.get(`${prefix_admin}`, async (c) => c.redirect(adminIndex));
 app.get(`${prefix_admin}/`, async (c) => c.html(<AdminIndex />));
 app.route(`${prefix_admin}${LambdaAdmin.resource}`, LambdaAdmin.app);
