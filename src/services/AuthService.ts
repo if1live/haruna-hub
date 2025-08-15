@@ -1,7 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import type { Context } from "hono";
-import { jwtVerify } from "jose";
-import { getJWKS } from "../instances";
+import { createSupabaseClient } from "../instances";
 
 const parseCookieHeader = (header?: string): Map<string, string> => {
   if (!header) {
@@ -48,6 +47,15 @@ export const getUserFromCookie = (cookie: string): User | undefined => {
 };
 
 export const verify = async (c: Context) => {
+  const sb = createSupabaseClient(c);
+  const { data, error } = await sb.auth.getUser();
+  if (error) {
+    throw error;
+  }
+
+  return data.user;
+
+  /*
   const cookie = c.req.header("Cookie") ?? "";
   const cookies = parseCookieHeader(cookie);
   const authToken = extractAuthToken(cookies);
@@ -65,10 +73,11 @@ export const verify = async (c: Context) => {
   const iss = `${c.env.SUPABASE_URL}/auth/v1`;
   const jwks = getJWKS(iss);
   const { payload } = await jwtVerify(authToken, jwks, {
-    issuer: iss,
+    issuer: "https://mjrrhdjdbsaystkbxvup.supabase.co/auth/v1",
     algorithms: ["ES256"],
   });
   console.log(payload);
 
   return user;
+  */
 };
