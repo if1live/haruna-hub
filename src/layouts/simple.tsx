@@ -1,6 +1,6 @@
 import { parse } from "@aws-sdk/util-arn-parser";
 import type { FC } from "hono/jsx";
-import { Layout, MyNavBar } from "./layout";
+import { SiteLayout } from "./layout";
 
 type Site = {
   arn: string;
@@ -12,14 +12,11 @@ export const Top: FC<{
 }> = (props) => {
   const { functions } = props;
   return (
-    <Layout>
-      <MyNavBar />
-      <div class="container">
-        <img src="/static/title-01.webp" class="img-fluid" alt="haruna" />
-        <h2>http/https</h2>
-        <SiteList sites={functions} />
-      </div>
-    </Layout>
+    <SiteLayout>
+      <img src="/static/title-01.webp" class="img-fluid" alt="haruna" />
+      <h2>http/https</h2>
+      <SiteList sites={functions} />
+    </SiteLayout>
   );
 };
 
@@ -30,7 +27,8 @@ const SiteList: FC<{ sites: Site[] }> = (props) => {
       <thead>
         <tr>
           <th>name</th>
-          <th>etc</th>
+          <th>link</th>
+          <th>link (new tab)</th>
         </tr>
       </thead>
       <tbody>
@@ -50,24 +48,16 @@ const SiteElement: FC<{
   const parsed = parse(arn);
   const name = parsed.resource.split(":")[1];
 
-  const data = {
-    arn,
-  };
-
   return (
     <tr>
+      <td>{name}</td>
       <td>
-        <a href={url} target="_blank">
-          {name}
-        </a>
+        <a href={url}>goto</a>
       </td>
       <td>
-        <details>
-          <summary>data</summary>
-          <div>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          </div>
-        </details>
+        <a href={url} target="_blank">
+          new tab
+        </a>
       </td>
     </tr>
   );

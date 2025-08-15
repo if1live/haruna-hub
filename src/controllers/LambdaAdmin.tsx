@@ -3,7 +3,10 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import type { Kysely } from "kysely";
 import { z } from "zod";
-import { AdminLambdaDetailsPage, AdminLambdaListPage } from "../layouts/admin";
+import {
+  AdminLambdaDetailsPage,
+  AdminLambdaListPage,
+} from "../layouts/adminLambda";
 import {
   AwsService,
   DatabaseService,
