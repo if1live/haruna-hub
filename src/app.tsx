@@ -22,9 +22,6 @@ export const app = new Hono<{ Bindings: MyBindings }>();
 
 const robotsTxt = `
 User-agent: *
-Allow: /
-
-User-agent: GPTBot
 Disallow: /
 `.trimStart();
 
