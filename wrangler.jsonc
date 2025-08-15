@@ -14,7 +14,10 @@
       "binding": "HYPERDRIVE",
       "id": "2848eae8db184f72acbefb596a25d7fa"
     }
-  ]
+  ],
+  "placement": {
+    "mode": "smart"
+  }
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
