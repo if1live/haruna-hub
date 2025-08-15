@@ -39,9 +39,14 @@ app.post("logout", async (c) => {
 });
 
 app.get("verify", async (c) => {
-  const user = await AuthService.verify(c);
-  if (!user) {
+  const result = await AuthService.verify(c);
+  if (!result) {
     return c.json({ message: "no user" });
   }
-  return c.json(user);
+
+  const { user } = result;
+  return c.json({
+    id: user.id,
+    email: user.email,
+  });
 });

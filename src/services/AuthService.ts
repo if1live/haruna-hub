@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import type { Context } from "hono";
-import { createSupabaseClient } from "../instances";
+import { jwtVerify } from "jose";
+import { getJWKS } from "../instances";
 
 const parseCookieHeader = (header?: string): Map<string, string> => {
   if (!header) {
@@ -18,7 +19,8 @@ const parseCookieHeader = (header?: string): Map<string, string> => {
 
 export const getUserFromContext = (c: Context): User | undefined => {
   const cookie = c.req.header("Cookie") ?? "";
-  return getUserFromCookie(cookie);
+  const result = decodeAuthTokenFromCookie(cookie);
+  return result?.user;
 };
 
 const extractAuthToken = (cookies: Map<string, string>): string | undefined => {
@@ -32,7 +34,16 @@ const extractAuthToken = (cookies: Map<string, string>): string | undefined => {
   return;
 };
 
-export const getUserFromCookie = (cookie: string): User | undefined => {
+type AuthToken = {
+  access_token: string;
+  token_type: "bearer";
+  expires_in: number;
+  expires_at: number;
+  refresh_token: string;
+  user: User;
+};
+
+const decodeAuthTokenFromCookie = (cookie: string): AuthToken | undefined => {
   const cookies = parseCookieHeader(cookie);
   const authToken = extractAuthToken(cookies);
   if (!authToken) {
@@ -42,42 +53,31 @@ export const getUserFromCookie = (cookie: string): User | undefined => {
   const base64Encoded = authToken.replace("base64-", "");
   const base64Decode = Buffer.from(base64Encoded, "base64").toString("utf8");
   const authTokenObj = JSON.parse(base64Decode);
-  const user = authTokenObj.user as User;
-  return user;
+  return authTokenObj as AuthToken;
 };
 
 export const verify = async (c: Context) => {
-  const sb = createSupabaseClient(c);
-  const { data, error } = await sb.auth.getUser();
-  if (error) {
-    throw error;
-  }
+  // const sb = createSupabaseClient(c);
+  // const { data, error } = await sb.auth.getUser();
+  // if (error) throw error;
+  // return data.user;
 
-  return data.user;
-
-  /*
   const cookie = c.req.header("Cookie") ?? "";
-  const cookies = parseCookieHeader(cookie);
-  const authToken = extractAuthToken(cookies);
-  if (!authToken) {
+  const result = decodeAuthTokenFromCookie(cookie);
+  if (!result) {
     return;
   }
 
-  const base64Encoded = authToken.replace("base64-", "");
-  const base64Decode = Buffer.from(base64Encoded, "base64").toString("utf8");
-  const authTokenObj = JSON.parse(base64Decode);
-  const _accessToken = authTokenObj.access_token as string;
-  const user = authTokenObj.user as User;
-
-  // TODO: 인증 어떻게 구현할까?
+  const { access_token, user } = result;
   const iss = `${c.env.SUPABASE_URL}/auth/v1`;
   const jwks = getJWKS(iss);
-  const { payload } = await jwtVerify(authToken, jwks, {
-    issuer: "https://mjrrhdjdbsaystkbxvup.supabase.co/auth/v1",
+  const { payload } = await jwtVerify(access_token, jwks, {
+    issuer: iss,
     algorithms: ["ES256"],
   });
-  console.log(payload);
 
-  return user;
-  */
+  // payload 안에 유저 관련 정보가 꽤 들어있지만
+  // user에 있는 일부 속성이 빠져있어서 둘다 리턴한다
+  // accessToken은 용도에 맞게 정보가 빠져있는듯
+  return { user, payload };
 };
