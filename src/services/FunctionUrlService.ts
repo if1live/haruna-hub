@@ -4,6 +4,7 @@ import {
   ListFunctionUrlConfigsCommand,
 } from "@aws-sdk/client-lambda";
 import type { Kysely } from "kysely";
+import { FunctionUrlModel } from "../models";
 import { type DB, FunctionUrlTable } from "../tables";
 
 const table = FunctionUrlTable.name;
@@ -65,9 +66,20 @@ export const findByFunctionArn = async (db: Kysely<DB>, arn: string) => {
     .selectAll()
     .where("functionArn", "=", arn)
     .executeTakeFirst();
-  return found;
+  if (!found) {
+    return found;
+  }
+
+  const model = FunctionUrlModel.create(found);
+  return model;
 };
 
 export const deleteByFunctionArn = async (db: Kysely<DB>, arn: string) => {
   await db.deleteFrom(table).where("functionArn", "=", arn).execute();
+};
+
+export const findAll = async (db: Kysely<DB>) => {
+  const rows = await db.selectFrom(FunctionUrlTable.name).selectAll().execute();
+  const models = rows.map(FunctionUrlModel.create);
+  return models;
 };

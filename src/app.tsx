@@ -5,7 +5,7 @@ import { prettyJSON } from "hono/pretty-json";
 import type { Kysely } from "kysely";
 import * as R from "remeda";
 import z from "zod";
-import { LookupAdmin } from "./controllers";
+import { LambdaAdmin, LookupAdmin } from "./controllers";
 import { Top } from "./layouts/simple";
 import {
   AwsService,
@@ -123,3 +123,4 @@ app.get(`${prefix_admin}`, async (c) => c.redirect(adminIndex));
 app.get(`${prefix_admin}/`, async (c) => c.redirect(adminIndex));
 
 app.route(`${prefix_admin}${LookupAdmin.resource}`, LookupAdmin.app);
+app.route(`${prefix_admin}${LambdaAdmin.resource}`, LambdaAdmin.app);

@@ -5,6 +5,7 @@ import {
 } from "@aws-sdk/client-lambda";
 import type { Kysely } from "kysely";
 import * as R from "remeda";
+import { FunctionDefinitionModel } from "../models";
 import { type DB, FunctionDefinitionTable } from "../tables";
 
 const table = FunctionDefinitionTable.name;
@@ -14,8 +15,14 @@ export const retrieve = async (
 ): Promise<FunctionConfiguration[]> => {
   // TODO: 페이징 구현? 당장은 함수가 그정도로 많지 않을거다
   const output = await client.send(new ListFunctionsCommand({ MaxItems: 100 }));
-  const list = output.Functions ?? [];
+  const list = (output.Functions ?? []).map(sanitize);
   return list;
+};
+
+// 민감한 정보 지워두기. 디버깅용으로 남겨두는 정보니까
+const sanitize = (data: FunctionConfiguration) => {
+  delete data.Environment;
+  return data;
 };
 
 export const synchronize = async (
@@ -132,4 +139,21 @@ export const findByFunctionName = async (db: Kysely<DB>, name: string) => {
     .where("functionName", "=", name)
     .executeTakeFirst();
   return found;
+};
+
+export const findByFunctionArnOrThrow = async (db: Kysely<DB>, arn: string) => {
+  const found = await db
+    .selectFrom(table)
+    .selectAll()
+    .where("functionArn", "=", arn)
+    .executeTakeFirstOrThrow();
+
+  const model = FunctionDefinitionModel.create(found);
+  return model;
+};
+
+export const findAll = async (db: Kysely<DB>) => {
+  const rows = await db.selectFrom(table).selectAll().execute();
+  const models = rows.map(FunctionDefinitionModel.create);
+  return models;
 };

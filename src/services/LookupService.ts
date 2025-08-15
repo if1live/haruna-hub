@@ -1,16 +1,11 @@
 import type { Kysely } from "kysely";
-import { type DB, FunctionDefinitionTable, FunctionUrlTable } from "../tables";
+import type { DB } from "../tables";
+import * as FunctionDefinitionService from "./FunctionDefinitionService";
+import * as FunctionUrlService from "./FunctionUrlService";
 
 export const load = async (db: Kysely<DB>) => {
-  const list_definition = await db
-    .selectFrom(FunctionDefinitionTable.name)
-    .selectAll()
-    .execute();
-
-  const list_url = await db
-    .selectFrom(FunctionUrlTable.name)
-    .selectAll()
-    .execute();
+  const list_definition = await FunctionDefinitionService.findAll(db);
+  const list_url = await FunctionUrlService.findAll(db);
 
   const map_url = new Map<string, (typeof list_url)[number]>();
   for (const x of list_url) {
@@ -23,4 +18,13 @@ export const load = async (db: Kysely<DB>) => {
   });
 
   return entries;
+};
+
+export const find = async (db: Kysely<DB>, arn: string) => {
+  const definition = await FunctionDefinitionService.findByFunctionArnOrThrow(
+    db,
+    arn,
+  );
+  const url = await FunctionUrlService.findByFunctionArn(db, arn);
+  return { definition, url };
 };

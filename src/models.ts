@@ -11,13 +11,16 @@ const parse_functionArn = (functionArn: string) => {
 // db에서 그대로 읽은것에 필요한 속성 몇개 더 넣어서 쓰고 싶다
 export type FunctionDefinitionModel = FunctionDefinitionTable.Row & {
   display_functionArn: string;
+  lastModified: Date;
 };
 
 export const FunctionDefinitionModel = {
   create(input: FunctionDefinitionTable.Row): FunctionDefinitionModel {
+    const payload = input.payload as Record<string, unknown>;
     return {
       ...input,
       display_functionArn: parse_functionArn(input.functionArn),
+      lastModified: new Date(payload.LastModified as string),
     };
   },
 };
