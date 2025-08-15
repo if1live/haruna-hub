@@ -20,8 +20,25 @@ export const retrieve = async (
 };
 
 // 민감한 정보 지워두기. 디버깅용으로 남겨두는 정보니까
+// 관심없는 정보도 지우자
 const sanitize = (data: FunctionConfiguration) => {
-  delete data.Environment;
+  const keys = [
+    "Environment",
+    "TracingConfig",
+    "VpcConfig",
+    "SnapStart",
+    "Role",
+    "RevisionId",
+    "Version",
+    "Handler",
+    "CodeSha256",
+    "CodeSize",
+    "LoggingConfig",
+    "EphemeralStorage",
+  ] as const;
+  for (const key of keys) {
+    delete data[key];
+  }
   return data;
 };
 
