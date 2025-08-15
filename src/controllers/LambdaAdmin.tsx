@@ -88,13 +88,12 @@ app.post("/truncate", async (c) => {
   return DatabaseService.withDatabase(execute)(c.env);
 });
 
-app.post("/reset", functionArnValidator, async (c) => {
-  const validated = c.req.valid("query");
-  const { functionArn } = validated;
+app.post("/:arn/reset", async (c) => {
+  const functionArn = c.req.param("arn");
 
   const execute = async (db: Kysely<DB>) => {
     await FunctionUrlService.deleteByFunctionArn(db, functionArn);
-    return c.redirect(indexLocation);
+    return c.html(`<span>reset: ok</span>`);
   };
   return DatabaseService.withDatabase(execute)(c.env);
 });

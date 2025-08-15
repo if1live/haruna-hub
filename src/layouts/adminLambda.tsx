@@ -37,13 +37,19 @@ const SynchronizeUrlButton: FC<{ arn: string }> = (props) => {
 };
 
 const ResetFunctionButton: FC<{ arn: string }> = (props) => {
-  const url = `/admin/lambda/reset?functionArn=${props.arn}`;
+  const url = `/admin/lambda/${props.arn}/reset`;
   return (
-    <form method="post" action={url}>
-      <button class="btn btn-danger" type="submit">
-        reset
-      </button>
-    </form>
+    <button class="btn btn-danger" type="submit" hx-post={url}>
+      reset
+    </button>
+  );
+};
+
+const ReloadButton: FC = (_props) => {
+  return (
+    <a class="btn btn-outline-secondary" href=".">
+      reload
+    </a>
   );
 };
 
@@ -145,6 +151,7 @@ export const AdminLambdaDetailsPage: FC<{
       <div class="btn-group">
         <SynchronizeUrlButton arn={functionArn} />
         {dataUrl ? <ResetFunctionButton arn={functionArn} /> : null}
+        <ReloadButton />
       </div>
     </AdminLayout>
   );
