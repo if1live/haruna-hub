@@ -40,6 +40,7 @@
     "typeorm": "^0.3.25",
     "typeorm-naming-strategies": "^4.1.0",
     "typescript": "^5.9.2",
+    "unplugin-swc": "^1.5.5",
     "vitest": "^3.2.4",
     "wrangler": "^4.30.0"
   },

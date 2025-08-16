@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import {
-  Generated,
+  type Generated,
   Kysely,
   ParseJSONResultsPlugin,
   SqliteAdapter,
