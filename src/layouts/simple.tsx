@@ -19,15 +19,15 @@ export const Top: FC<{
     <SiteLayout>
       <img src="/static/title-01.webp" class="img-fluid" alt="haruna" />
 
-      <h3>pub http/https</h3>
-      <SiteList sites={pubFunctions} />
-
       {user ? (
         <>
           <h3>priv http/https</h3>
           <SiteList sites={privFunctions} />
         </>
       ) : null}
+
+      <h3>pub http/https</h3>
+      <SiteList sites={pubFunctions} />
     </SiteLayout>
   );
 };
