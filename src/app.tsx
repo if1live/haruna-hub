@@ -15,7 +15,7 @@ import {
   FunctionUrlService,
   LookupService,
 } from "./services";
-import { withDatabase } from "./services/DatabaseService";
+import { withDatabase } from "./services/ConnectorService";
 import type { DB } from "./tables";
 import type { MyBindings } from "./types";
 

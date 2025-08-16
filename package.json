@@ -7,7 +7,8 @@
     "deploy": "wrangler deploy --minify",
     "dev": "wrangler dev",
     "fix": "biome check --write --unsafe .",
-    "lint": "biome check ."
+    "lint": "biome check .",
+    "test": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.865.0",
@@ -26,8 +27,11 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
     "@cloudflare/workers-types": "^4.20250813.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/pg": "^8.15.5",
+    "better-sqlite3": "^12.2.0",
     "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
     "wrangler": "^4.30.0"
   },
   "packageManager": "pnpm@10.14.0"
