@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
+import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { Kysely } from "kysely";
 import * as R from "remeda";
@@ -47,6 +48,9 @@ const _prefix_site = "/s" as const;
 const prefix_admin = "/admin" as const;
 
 app.use("*", prettyJSON());
+
+const loggerMiddlewareObj = logger();
+app.use(async (c, next) => (isWorkerd ? next() : loggerMiddlewareObj(c, next)));
 
 app.use("*", async (c, next) => {
   if (!localEnv) {
