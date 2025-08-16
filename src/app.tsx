@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { prettyJSON } from "hono/pretty-json";
 import type { Kysely } from "kysely";
 import * as R from "remeda";
+import { isWorkerd } from "std-env";
 import z from "zod";
 import { AuthController, LambdaAdmin } from "./controllers";
 import { getLambdaClient } from "./instances";
@@ -19,6 +20,21 @@ import { withDatabase } from "./services/ConnectorService";
 import type { DB } from "./tables";
 import type { MyBindings } from "./types";
 
+// 로컬 환경에서는 .dev.vars를 환경변수로 적당히 대응하기
+let localEnv: Map<string, string> | null = null;
+if (!isWorkerd) {
+  const fs = await import("node:fs/promises");
+  const text = await fs.readFile(".dev.vars", "utf-8");
+  const entries = text
+    .split("\n")
+    .filter((line) => line.trim() && !line.startsWith("#"))
+    .map((x) => {
+      const [key, value] = x.split("=");
+      return [key, value] as const;
+    });
+  localEnv = new Map(entries);
+}
+
 export const app = new Hono<{ Bindings: MyBindings }>();
 
 const robotsTxt = `
@@ -31,6 +47,25 @@ const _prefix_site = "/s" as const;
 const prefix_admin = "/admin" as const;
 
 app.use("*", prettyJSON());
+
+app.use("*", async (c, next) => {
+  if (!localEnv) {
+    return next();
+  }
+
+  for (const [key, value] of localEnv.entries()) {
+    // biome-ignore lint/suspicious/noExplicitAny: TODO
+    (c.env as any)[key] = value;
+  }
+
+  // node.js로 돌릴떄는 적당히 db 가라치기
+  // TODO: .dev.vars에 있는 DATABASE_URL 쓰는게 나을지도?
+  c.env.HYPERDRIVE = {
+    connectionString: "sqlite:sqlite.db",
+  };
+
+  return next();
+});
 
 app.use("/admin/*", async (c, next) => {
   const user = AuthService.getUserFromContext(c);
