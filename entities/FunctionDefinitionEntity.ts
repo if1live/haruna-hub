@@ -12,13 +12,13 @@ export class MyEntity {
   @PrimaryGeneratedColumn()
   id!: Generated<number>;
 
-  @Column()
+  @Column({ length: 191 })
   region!: string;
 
-  @Column()
+  @Column({ length: 191 })
   functionName!: string;
 
-  @Column()
+  @Column({ length: 191, unique: true })
   functionArn!: string;
 
   @Column({ type: "simple-json" })

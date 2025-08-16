@@ -12,10 +12,12 @@ export class MyEntity {
   @PrimaryGeneratedColumn()
   id!: Generated<number>;
 
-  @Column()
+  /** @example "arn:aws:lambda:ap-northeast-1:123456789012:function:ayane-dev-http" */
+  @Column({ length: 191, unique: true })
   functionArn!: string;
 
-  @Column()
+  /** @example "https://abcdefghijk.lambda-url.ap-northeast-1.on.aws/" */
+  @Column({ length: 191, unique: true })
   functionUrl!: string;
 
   @Column({ type: "simple-json" })
