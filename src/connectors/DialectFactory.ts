@@ -107,3 +107,5 @@ export const create = (input: string): SqliteDialect | PostgresDialect => {
       return create_postgres(...parsed.input);
   }
 };
+
+export const inMemory = () => create_sqlite(":memory:");

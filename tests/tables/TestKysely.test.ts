@@ -1,15 +1,15 @@
 import type { Kysely } from "kysely";
 import { afterAll, assert, beforeAll, describe, it } from "vitest";
 import { type DB, FunctionUrlTable, toSqlJson } from "../../src/tables";
-import { KyselyTestKit } from "./KyselyTestKit";
+import { TestKysely } from "./TestKysely";
 
-describe("KyselyTestKit#kysely.sqlite", () => {
+describe("TestKysely#kysely.sqlite", () => {
   describe("happy-path", () => {
     let db: Kysely<DB>;
 
     beforeAll(async () => {
-      db = KyselyTestKit.create();
-      await KyselyTestKit.synchronize(db);
+      db = TestKysely.create();
+      await TestKysely.synchronize(db);
     });
 
     afterAll(async () => {

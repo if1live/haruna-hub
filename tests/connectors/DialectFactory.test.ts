@@ -28,10 +28,9 @@ interface Database {
 }
 
 describe("DialectFactory", async () => {
-  const dialect = DialectFactory.create(":memory:");
   // 플러그인으로 테스트 꺠지는거 피하려고 직접 객체 만듬
   const db = new Kysely<Database>({
-    dialect,
+    dialect: DialectFactory.inMemory(),
     plugins: [new ParseJSONResultsPlugin()],
   });
 
