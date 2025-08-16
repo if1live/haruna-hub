@@ -1,10 +1,7 @@
-import { type Kysely, type RawBuilder, sql } from "kysely";
+import type { Kysely } from "kysely";
 import { afterAll, assert, beforeAll, describe, it } from "vitest";
-import { type DB, FunctionUrlTable } from "../../src/tables";
+import { type DB, FunctionUrlTable, toSqlJson } from "../../src/tables";
 import { KyselyTestKit } from "./KyselyTestKit";
-
-// https://kysely.dev/docs/recipes/extending-kysely
-const toSqlJson = <T>(obj: T): RawBuilder<T> => sql`${JSON.stringify(obj)}`;
 
 describe("KyselyTestKit#kysely.sqlite", () => {
   describe("happy-path", () => {
