@@ -2,7 +2,12 @@
   "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "files": {
     "ignoreUnknown": true,
-    "includes": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"]
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "test/**/*.ts",
+      "entities/**/*.ts"
+    ]
   },
   "formatter": {
     "indentStyle": "space"

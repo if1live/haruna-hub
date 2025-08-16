@@ -1,13 +1,7 @@
-import type { Generated, Selectable } from "kysely";
+import type { Selectable } from "kysely";
+import type { KyselifyEntity } from "kysely-typeorm";
+import type { FunctionDefinitionEntity } from "../../entities";
 
-export const name = "functionDefinition";
-
-export type Table = {
-  id: Generated<number>;
-  region: string;
-  functionName: string;
-  functionArn: string;
-  payload: unknown;
-};
-
+export const name: FunctionDefinitionEntity.KyselyName = "functionDefinition";
+export type Table = KyselifyEntity<FunctionDefinitionEntity.MyEntity>;
 export type Row = Selectable<Table>;

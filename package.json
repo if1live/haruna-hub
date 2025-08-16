@@ -9,7 +9,8 @@
     "dev": "wrangler dev",
     "fix": "biome check --write --unsafe .",
     "lint": "biome check .",
-    "test": "vitest"
+    "test": "vitest",
+    "typeorm:sqlite": "cross-env ENGINE=sqlite typeorm-ts-node-esm -d data-source.ts"
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.865.0",
@@ -23,6 +24,7 @@
     "kysely-plugin-prefix": "^1.2.2",
     "pg": "^8.16.3",
     "remeda": "^2.30.0",
+    "type-fest": "^4.41.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
@@ -31,6 +33,12 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/pg": "^8.15.5",
     "better-sqlite3": "^12.2.0",
+    "cross-env": "^10.0.0",
+    "kysely-typeorm": "^0.3.0",
+    "reflect-metadata": "^0.2.2",
+    "ts-node": "^10.9.2",
+    "typeorm": "^0.3.25",
+    "typeorm-naming-strategies": "^4.1.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
     "wrangler": "^4.30.0"
