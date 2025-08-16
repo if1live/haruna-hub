@@ -24,10 +24,20 @@ const createLambdaClient_localhost: LambdaClientFn = (region, env) => {
   });
 };
 
-export const createLambdaClient = (region: string, env: MyBindings) =>
+const createLambdaClient = (region: string, env: MyBindings) =>
   env.LAMBDA_URL === undefined
     ? createLambdaClient_prod(region, env)
     : createLambdaClient_localhost(region, env);
+
+const lambdaClientByRegion = new Map<string, LambdaClient>();
+export const getLambdaClient = (region: string, env: MyBindings) => {
+  let client = lambdaClientByRegion.get(region);
+  if (!client) {
+    client = createLambdaClient(region, env);
+    lambdaClientByRegion.set(region, client);
+  }
+  return client;
+};
 
 // 요청 헤더를 간단히 파싱해서 getAll() 형태로 변환
 function parseCookieHeader(header?: string) {

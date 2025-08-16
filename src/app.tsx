@@ -6,7 +6,7 @@ import type { Kysely } from "kysely";
 import * as R from "remeda";
 import z from "zod";
 import { AuthController, LambdaAdmin } from "./controllers";
-import { createLambdaClient } from "./instances";
+import { getLambdaClient } from "./instances";
 import { AdminIndex } from "./layouts/adminIndex";
 import { Top } from "./layouts/simple";
 import {
@@ -59,7 +59,7 @@ app.get(
   ),
   async (c) => {
     const validated = c.req.valid("query");
-    const client = createLambdaClient(validated.region, c.env);
+    const client = getLambdaClient(validated.region, c.env);
     const list = await FunctionDefinitionService.retrieve(client);
     return c.json(list);
   },
@@ -76,7 +76,7 @@ app.get(
   ),
   async (c) => {
     const validated = c.req.valid("query");
-    const client = createLambdaClient(validated.region, c.env);
+    const client = getLambdaClient(validated.region, c.env);
     const list = await FunctionUrlService.retrieve(
       client,
       validated.functionName,

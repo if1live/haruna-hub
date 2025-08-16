@@ -3,7 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import type { Kysely } from "kysely";
 import { z } from "zod";
-import { createLambdaClient } from "../instances";
+import { getLambdaClient } from "../instances";
 import {
   AdminLambdaDetailsPage,
   AdminLambdaListPage,
@@ -103,7 +103,7 @@ app.post("/synchronize/list", regionValidator, async (c) => {
   const { region } = validated;
 
   const execute = async (db: Kysely<DB>) => {
-    const client = createLambdaClient(region, c.env);
+    const client = getLambdaClient(region, c.env);
     const founds = await FunctionDefinitionService.retrieve(client);
     const _results = await FunctionDefinitionService.synchronize(
       db,
@@ -122,7 +122,7 @@ app.post("/:arn/synchronize/url", async (c) => {
   const functionName = parsed.resource.split(":")[1];
 
   const execute = async (db: Kysely<DB>) => {
-    const client = createLambdaClient(region, c.env);
+    const client = getLambdaClient(region, c.env);
     const founds = await FunctionUrlService.retrieve(client, functionName);
     const first = founds[0];
     if (!first) {
