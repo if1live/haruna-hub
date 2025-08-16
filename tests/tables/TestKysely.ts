@@ -1,8 +1,9 @@
 import { CamelCasePlugin, Kysely, ParseJSONResultsPlugin } from "kysely";
 import { TablePrefixPlugin } from "kysely-plugin-prefix";
 import { entities } from "../../entities";
-import { DialectFactory, KyselyTestKit } from "../../src/connectors";
+import { DialectFactory } from "../../src/connectors";
 import type { DB } from "../../src/tables";
+import { KyselyTestKit } from "../connectors/KyselyTestKit";
 
 const synchronize = async <T = DB>(db: Kysely<T>) => {
   await KyselyTestKit.initialize(db, entities);

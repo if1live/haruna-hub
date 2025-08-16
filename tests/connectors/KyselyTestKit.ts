@@ -42,7 +42,7 @@ const getAdapter = <T>(db: Kysely<T>): EngineType => {
   });
 };
 
-export const initialize = async <T>(db: Kysely<T>, entities: EntityList) => {
+const initialize = async <T>(db: Kysely<T>, entities: EntityList) => {
   const type = getAdapter(db);
   const dataSource = await createDataSource(type, entities);
   await dataSource.initialize();
@@ -58,4 +58,8 @@ export const initialize = async <T>(db: Kysely<T>, entities: EntityList) => {
     const compiled = sql<unknown>(input).compile(db);
     await db.executeQuery(compiled);
   }
+};
+
+export const KyselyTestKit = {
+  initialize,
 };

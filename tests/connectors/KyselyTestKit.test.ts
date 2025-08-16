@@ -2,7 +2,8 @@ import { type Insertable, Kysely } from "kysely";
 import type { Generated, KyselifyEntity } from "kysely-typeorm";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { afterAll, assert, beforeAll, describe, it } from "vitest";
-import { DialectFactory, KyselyTestKit } from "../../src/connectors";
+import { DialectFactory } from "../../src/connectors";
+import { KyselyTestKit } from "./KyselyTestKit";
 
 const tableName = "sample";
 
