@@ -19,26 +19,28 @@ export const Top: FC<{
     <SiteLayout>
       <img src="/static/title-01.webp" class="img-fluid" alt="haruna" />
 
-      {user ? (
-        <>
-          <h3>priv http/https</h3>
-          <SiteList sites={privFunctions} />
-        </>
-      ) : null}
-
-      <h3>pub http/https</h3>
-      <SiteList sites={pubFunctions} />
+      <table class="table table-sm table-hover">
+        {user && privFunctions.length > 0 ? (
+          <SiteList title="priv site" sites={privFunctions} />
+        ) : null}
+        {pubFunctions.length > 0 ? (
+          <SiteList title="pub site" sites={pubFunctions} />
+        ) : null}
+      </table>
     </SiteLayout>
   );
 };
 
-const SiteList: FC<{ sites: Site[] }> = (props) => {
-  const { sites } = props;
+const SiteList: FC<{
+  title: string;
+  sites: Site[];
+}> = (props) => {
+  const { title, sites } = props;
   return (
-    <table class="table table-sm table-hover">
+    <>
       <thead>
         <tr>
-          <th>name</th>
+          <th>{title}</th>
           <th>link</th>
           <th>link (new tab)</th>
         </tr>
@@ -48,7 +50,7 @@ const SiteList: FC<{ sites: Site[] }> = (props) => {
           <SiteElement site={site} />
         ))}
       </tbody>
-    </table>
+    </>
   );
 };
 
