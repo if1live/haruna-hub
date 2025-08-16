@@ -115,8 +115,11 @@ app.get("/", async (c) => {
       })
       .filter(R.isNonNullish);
 
-    const list0 = user ? list : [];
-    return c.html(<Top functions={list0} />);
+    const privList = user ? list : [];
+
+    return c.html(
+      <Top pubFunctions={[]} privFunctions={privList} user={user} />,
+    );
   };
 
   return withDatabase(execute)(c.env);

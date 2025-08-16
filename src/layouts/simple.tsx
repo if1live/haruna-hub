@@ -1,4 +1,5 @@
 import { parse } from "@aws-sdk/util-arn-parser";
+import type { User } from "@supabase/supabase-js";
 import type { FC } from "hono/jsx";
 import { SiteLayout } from "./layout";
 
@@ -8,14 +9,25 @@ type Site = {
 };
 
 export const Top: FC<{
-  functions: Site[];
+  user: User | undefined;
+  pubFunctions: Site[];
+  privFunctions: Site[];
 }> = (props) => {
-  const { functions } = props;
+  const { pubFunctions, privFunctions, user } = props;
+
   return (
     <SiteLayout>
       <img src="/static/title-01.webp" class="img-fluid" alt="haruna" />
-      <h2>http/https</h2>
-      <SiteList sites={functions} />
+
+      <h3>pub http/https</h3>
+      <SiteList sites={pubFunctions} />
+
+      {user ? (
+        <>
+          <h3>priv http/https</h3>
+          <SiteList sites={privFunctions} />
+        </>
+      ) : null}
     </SiteLayout>
   );
 };

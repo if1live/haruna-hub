@@ -4,7 +4,7 @@ const BaseLayout: FC = (props) => (
   <html lang="ko">
     <head>
       <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Haruna Hub</title>
       <link rel="icon" href="/static/favicon.ico" sizes="any" />
       <link rel="apple-touch-icon" href="/static/icon.png" />
