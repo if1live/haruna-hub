@@ -93,7 +93,7 @@ app.post("/:arn/reset", async (c) => {
 
   const execute = async (db: Kysely<DB>) => {
     await FunctionUrlService.deleteByFunctionArn(db, functionArn);
-    return c.html(`<span>reset: ok</span>`);
+    return c.html(<span>reset: ok</span>);
   };
   return DatabaseService.withDatabase(execute)(c.env);
 });
@@ -126,11 +126,11 @@ app.post("/:arn/synchronize/url", async (c) => {
     const founds = await FunctionUrlService.retrieve(client, functionName);
     const first = founds[0];
     if (!first) {
-      return c.html(`<span>synchronize.url: not found</span>`);
+      return c.html(<span>synchronize.url: not found</span>);
     }
 
     await FunctionUrlService.synchronize(db, first);
-    return c.html(`<span>synchronize.url: ok</span>`);
+    return c.html(<span>synchronize.url: ok</span>);
   };
   return DatabaseService.withDatabase(execute)(c.env);
 });
